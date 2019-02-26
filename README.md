@@ -1,5 +1,5 @@
 # MyGolang
-学习笔记文档，兼测试等。  
+学习笔记文档，兼测试git等w 
 ```go
 package main
 
