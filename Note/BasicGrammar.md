@@ -150,6 +150,33 @@ a[1] = 100
 a[2] = 200
 ```
 ---
-## 结构体
-### 定义结构体：
-to be continued...
+## 结构体  
+一系列相同或不同类型的数据结构构成的集合。
+### 定义结构体：  
+```go
+    //定义结构体
+    type struct_variable_type struct{
+        key1 type;
+        key2 type;
+        ...
+        keyN type;
+    }
+
+    //用结构体声明变量
+    struct_name := struct_variable_type {value1, value2...,valueN}
+    struct_name_name2 := struct_variable_type{key1: value1, key2: value2..., keyN: valueN}
+
+    //访问结构体成员
+    结构体.成员名
+
+    //结构体名struct_name可以作为函数参数
+```
+### 结构体指针：  
+```go
+    //定义指向结构体的指针
+    var struct_pointer *struct_variable_type
+    struct_pointer = &struct_name
+
+    //使用指针访问成员
+    struct_pointer.keyN
+```
