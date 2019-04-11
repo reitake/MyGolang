@@ -18,8 +18,12 @@ const (
 var err error
 
 func main() {
-	e := movepic()
-	fmt.Println("err in main:", e)
+	for i := 0; i < 20; i++ {
+		e := movepic()
+		fmt.Println("err in main:", e, "i =", i)
+		time.Sleep(1e9)
+	}
+
 }
 
 func movepic() error {
@@ -51,7 +55,7 @@ func movepic() error {
 		if err != nil {
 			return err
 		}
-		fmt.Println("不存在转移图片的目标文件夹，但已成功创建！")
+		fmt.Printf("不存在转移图片的目标文件夹，但已成功创建！路径：%s", imagesFolderDonePath)
 	}
 
 	// 读取目录下文件列表
@@ -60,39 +64,27 @@ func movepic() error {
 		return err
 	}
 
-	/*fmt.Println("文件夹中的文件有：")
-	for i := 0; i < len(images); i++ {
-		fmt.Println("  - ", images[i].Name())
-	}*/
-
-	// 判断读取到的文件后缀，并剔除读取到的切片中不是图片(.png/jpg/jpeg)的文件
 	_ = images
 	for i := 0; i < len(images); {
-		if strings.HasSuffix(strings.ToLower(images[i].Name()), ".jpg") || strings.HasSuffix(strings.ToLower(images[i].Name()), ".png") || strings.HasSuffix(strings.ToLower(images[i].Name()), ".jpeg") {
+		if strings.HasSuffix(strings.ToLower(images[i].Name()), ".jpg") ||
+			strings.HasSuffix(strings.ToLower(images[i].Name()), ".png") ||
+			strings.HasSuffix(strings.ToLower(images[i].Name()), ".jpeg") ||
+			strings.HasSuffix(strings.ToLower(images[i].Name()), ".gif") {
 			i++
 		} else {
 			images = append(images[:i], images[i+1:]...)
 		}
 	}
 	if len(images) == 0 {
-		fmt.Printf("\"%s\"文件夹中未找到 .jpg/.png/.jpeg 后缀的图片！\n", IMAGESFOLDER)
-		err = errors.New("图片库文件夹中未发现图片！")
+		fmt.Printf("\"%s\"文件夹中未找到 .png/.jpg/.jpeg/.gif 后缀的图片！\n", IMAGESFOLDER)
+		err = errors.New("图片库文件夹中未发现可用图片！")
 		return err
 	}
 
-	fmt.Println("剔除非图片后，文件夹中的文件有：")
-	for i := 0; i < len(images); i++ {
-		fmt.Println("  - ", images[i].Name())
-	}
-
-	_ = renameImage(imagesFolderPath, images[0].Name())
-
-	fmt.Println("改名后，文件夹中的文件有：")
-	for i := 0; i < len(images); i++ {
-		fmt.Println("  - ", images[i].Name())
-	}
-
+	// 把第一张图片改名，并转移到DONE文件夹
+	renameImage(imagesFolderPath, imagesFolderDonePath, images[0].Name())
 	return nil
+
 }
 
 func isPathExists(path string) (bool, error) {
@@ -106,22 +98,23 @@ func isPathExists(path string) (bool, error) {
 	return false, err
 }
 
-func renameImage(folderPath string, imageName string) string {
+func renameImage(folderPath string, tofolderPath string, imageName string) {
 	oldpath := folderPath + PTHSEP + imageName
 	var newpath string
 	switch {
 	case strings.HasSuffix(strings.ToLower(imageName), ".png"):
-		newpath = folderPath + PTHSEP + time.Now().Format("2006-01-02-15-04-05") + ".png"
+		newpath = tofolderPath + PTHSEP + time.Now().Format("2006-01-02-15-04-05") + ".png"
 	case strings.HasSuffix(strings.ToLower(imageName), ".jpg"):
-		newpath = folderPath + PTHSEP + time.Now().Format("2006-01-02-15-04-05") + ".jpg"
+		newpath = tofolderPath + PTHSEP + time.Now().Format("2006-01-02-15-04-05") + ".jpg"
 	case strings.HasSuffix(strings.ToLower(imageName), ".jpeg"):
-		newpath = folderPath + PTHSEP + time.Now().Format("2006-01-02-15-04-05") + ".jpeg"
+		newpath = tofolderPath + PTHSEP + time.Now().Format("2006-01-02-15-04-05") + ".jpeg"
+	case strings.HasSuffix(strings.ToLower(imageName), ".gif"):
+		newpath = tofolderPath + PTHSEP + time.Now().Format("2006-01-02-15-04-05") + ".gif"
 	}
 	err := os.Rename(oldpath, newpath)
 	if err != nil {
-		fmt.Println("图片重命名时出错：", err)
-		return ""
+		fmt.Println("图片重命名并转移时出错：", err)
 	}
-	fmt.Println("图片重命名成功!")
-	return newpath
+	fmt.Printf("图片\"%s\"重命名及转移成功!新文件路径：%s\n", imageName, newpath)
+	return
 }
