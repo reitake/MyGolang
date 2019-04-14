@@ -19,14 +19,14 @@ var err error
 
 func main() {
 	for i := 0; i < 20; i++ {
-		e := movepic()
+		e := Movepic()
 		fmt.Println("err in main:", e, "i =", i)
 		time.Sleep(1e9)
 	}
 
 }
 
-func movepic() error {
+func Movepic() error {
 
 	// 获取文件夹路径
 	tempPath, _ := os.Getwd()
